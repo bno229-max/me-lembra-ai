@@ -8,6 +8,7 @@
     <style>
         :root {
             --primary: #00f2fe;
+            --secondary: #ff007f;
             --bg: #0a0a0c;
             --glass: rgba(255, 255, 255, 0.07);
         }
@@ -36,35 +37,35 @@
 
         header {
             text-align: center;
-            padding: 20px 0 10px 0;
+            padding: 10px 0;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
+        /* Efeito Pulsante no Logo */
         .logo-circle {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             overflow: hidden;
             border: 2px solid var(--primary);
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            animation: pulseNeon 2s infinite ease-in-out;
         }
 
-        .logo-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        @keyframes pulseNeon {
+            0% { box-shadow: 0 0 5px rgba(0, 242, 254, 0.4); border-color: rgba(0, 242, 254, 0.6); }
+            50% { box-shadow: 0 0 25px rgba(0, 242, 254, 0.9); border-color: rgba(0, 242, 254, 1); }
+            100% { box-shadow: 0 0 5px rgba(0, 242, 254, 0.4); border-color: rgba(0, 242, 254, 0.6); }
         }
+
+        .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
 
         header h1 {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             margin: 0;
             background: linear-gradient(to bottom, #fff, #aaa);
             -webkit-background-clip: text;
@@ -79,35 +80,43 @@
             padding: 10px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             scrollbar-width: none;
         }
 
         #chat-window::-webkit-scrollbar { display: none; }
 
         .msg {
-            padding: 14px 20px;
-            border-radius: 22px;
+            padding: 12px 18px;
+            border-radius: 20px;
             max-width: 85%;
-            font-size: 0.95rem;
-            line-height: 1.5;
+            font-size: 0.9rem;
+            line-height: 1.4;
             white-space: pre-wrap;
             animation: slideUp 0.3s ease-out;
+            position: relative;
         }
 
         .bot { align-self: flex-start; background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-bottom-left-radius: 4px; backdrop-filter: blur(10px); }
         .user { align-self: flex-end; background: linear-gradient(135deg, #222, #000); border: 1px solid rgba(255,255,255,0.15); border-bottom-right-radius: 4px; }
 
+        .timestamp {
+            display: block;
+            font-size: 0.6rem;
+            opacity: 0.4;
+            margin-top: 6px;
+            text-align: right;
+        }
+
         .input-area {
             background: rgba(255, 255, 255, 0.05);
-            padding: 10px 15px;
-            border-radius: 24px;
+            padding: 8px 12px;
+            border-radius: 22px;
             display: flex;
             align-items: flex-end;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 10px;
             border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
         }
 
         textarea {
@@ -120,29 +129,41 @@
             font-family: 'Montserrat', sans-serif;
             resize: none;
             padding: 8px 0;
-            max-height: 120px;
+            max-height: 100px;
         }
 
         button {
             background: var(--primary);
             border: none;
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            transition: transform 0.2s;
         }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        b { color: var(--primary); }
-        .tag { font-size: 0.7rem; color: var(--primary); display: block; border-bottom: 1px solid #333; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
+        
+        .txt-destaque { color: var(--primary); font-weight: 600; }
+        
+        /* Tema Feminino */
+        .mulher .txt-destaque { color: var(--secondary); }
+        .mulher .logo-circle { border-color: var(--secondary); animation: pulseNeonMulher 2s infinite ease-in-out; }
+        .mulher button { background: var(--secondary); }
+
+        @keyframes pulseNeonMulher {
+            0% { box-shadow: 0 0 5px rgba(255, 0, 127, 0.4); border-color: rgba(255, 0, 127, 0.6); }
+            50% { box-shadow: 0 0 25px rgba(255, 0, 127, 0.9); border-color: rgba(255, 0, 127, 1); }
+            100% { box-shadow: 0 0 5px rgba(255, 0, 127, 0.4); border-color: rgba(255, 0, 127, 0.6); }
+        }
+
+        .tag-busca { font-size: 0.65rem; display: inline-block; padding: 2px 6px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-right: 4px; color: #fff; margin-top: 4px; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
-<body>
+<body id="mainBody">
 
 <div class="app-container">
     <header>
@@ -156,9 +177,9 @@
     <div id="chat-window"></div>
 
     <div class="input-area">
-        <textarea id="userInput" placeholder="Salvar, Lembrar, Excluir..." rows="1"></textarea>
+        <textarea id="userInput" placeholder="Salvar, Lembrar ou Excluir..." rows="1"></textarea>
         <button onclick="processar()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         </button>
     </div>
 </div>
@@ -166,6 +187,8 @@
 <script>
     const chatWindow = document.getElementById('chat-window');
     const input = document.getElementById('userInput');
+    const body = document.getElementById('mainBody');
+    const nomesFemininos = ['maria', 'ana', 'joana', 'paula', 'carla', 'fernanda', 'luciana', 'patricia', 'beatriz', 'juliana', 'gabriela', 'amanda', 'larissa', 'leticia'];
 
     input.addEventListener('input', function() {
         this.style.height = 'auto';
@@ -174,17 +197,29 @@
 
     window.onload = () => {
         const nome = localStorage.getItem('user_name');
-        if (!nome) {
-            falar("Olá! Sou sua <b>memória auxiliar</b>. Como devo te chamar?");
+        if (nome) {
+            checkGenero(nome);
+            falar(`Fala, <span class="txt-destaque">${nome}</span>! O que vamos organizar hoje?`);
         } else {
-            falar(`Fala, <b>${nome}</b>! No que vamos focar hoje?`);
+            falar("Olá! Sou sua <b>memória auxiliar</b>. Como devo te chamar?");
         }
     };
 
-    function falar(texto) {
+    function checkGenero(nome) {
+        const n = nome.toLowerCase().split(' ')[0];
+        if (n.endsWith('a') || nomesFemininos.includes(n)) {
+            body.classList.add('mulher');
+        } else {
+            body.classList.remove('mulher');
+        }
+    }
+
+    function falar(texto, dataHora = "") {
         const div = document.createElement('div');
         div.className = 'msg bot';
-        div.innerHTML = texto;
+        let html = `<div>${texto}</div>`;
+        if (dataHora) html += `<span class="timestamp">${dataHora}</span>`;
+        div.innerHTML = html;
         chatWindow.appendChild(div);
         chatWindow.scrollTop = chatWindow.scrollHeight;
     }
@@ -200,66 +235,102 @@
 
         const nomeUsuario = localStorage.getItem('user_name');
         const linhas = rawText.split('\n');
-        const lowerText = rawText.toLowerCase();
         const primeiraLinhaPartes = linhas[0].split(/\s+/);
         const comando = primeiraLinhaPartes[0].toLowerCase();
 
         setTimeout(() => {
-            // TROCAR NOME OU PRIMEIRO ACESSO
-            if (!nomeUsuario || lowerText === "trocar nome") {
-                if (lowerText === "trocar nome") {
+            if (!nomeUsuario || rawText.toLowerCase() === "trocar nome") {
+                if (rawText.toLowerCase() === "trocar nome") {
                     localStorage.removeItem('user_name');
                     falar("Ok, como gostaria de ser chamado(a) agora?");
                 } else {
                     localStorage.setItem('user_name', rawText);
-                    falar(`Tudo pronto, <b>${rawText}</b>! No que posso ajudar?`);
+                    checkGenero(rawText);
+                    falar(`Tudo pronto, <span class="txt-destaque">${rawText}</span>! Já pode começar a salvar.`);
                 }
                 input.value = '';
                 return;
             }
 
-            // COMANDO: SALVAR
-            if (comando === "salvar") {
-                const titulo = primeiraLinhaPartes[1] ? primeiraLinhaPartes[1].toLowerCase() : null;
-                let conteudo = primeiraLinhaPartes.slice(2).join(' ').trim();
-                
-                if (linhas.length > 1) {
-                    const restoLinhas = linhas.slice(1).join('\n').trim();
-                    conteudo = conteudo ? conteudo + '\n' + restoLinhas : restoLinhas;
-                }
+            const agora = new Date();
+            const dataStr = agora.toLocaleDateString('pt-BR') + " às " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
 
-                if (titulo && conteudo) {
-                    localStorage.setItem(`mem_${titulo}`, conteudo);
-                    falar(`Beleza mensagem salva com sucesso, <b>${nomeUsuario}</b>! Guardado em "<b>${titulo}</b>".`);
+            // COMANDO SALVAR (Melhorado para frases curtas)
+            if (comando === "salvar") {
+                // Tenta pegar até 5 palavras para o título, mas se a frase for curta, ajusta dinamicamente
+                const totalPalavras = primeiraLinhaPartes.length;
+                let numPalavrasTitulo = Math.min(totalPalavras - 1, 5); 
+                
+                // Se só tiver o comando e mais uma ou duas palavras, o título é o que sobrar
+                if (totalPalavras <= 3) numPalavrasTitulo = totalPalavras - 1;
+
+                const tituloPartes = primeiraLinhaPartes.slice(1, numPalavrasTitulo + 1);
+                const tituloKey = tituloPartes.join(' ').toLowerCase();
+                
+                let conteudo = primeiraLinhaPartes.slice(numPalavrasTitulo + 1).join(' ').trim();
+                
+                // Se o conteúdo ficou vazio (frases tipo "Salvar telefone 119..."), 
+                // usamos a última palavra do título como valor e as anteriores como chave
+                if (!conteudo && tituloPartes.length > 1) {
+                    conteudo = tituloPartes.pop();
+                    const novaChave = tituloPartes.join(' ').toLowerCase();
+                    salvarNoStorage(novaChave, conteudo, tituloPartes, dataStr, nomeUsuario);
+                } else if (tituloKey && conteudo) {
+                    salvarNoStorage(tituloKey, conteudo, tituloPartes, dataStr, nomeUsuario);
                 } else {
-                    falar(`<b>${nomeUsuario}</b>, faltou o conteúdo! Ex: Salvar [título] [informação]`);
+                    falar(`Não entendi o que salvar, <span class="txt-destaque">${nomeUsuario}</span>. Tente: <i>Salvar [título] [conteúdo]</i>`);
                 }
             } 
             
-            // COMANDO: LEMBRAR
+            // LEMBRAR
             else if (comando === "lembrar") {
-                const busca = primeiraLinhaPartes[1] ? primeiraLinhaPartes[1].toLowerCase() : null;
-                const resultado = localStorage.getItem(`mem_${busca}`);
-                if (resultado) {
-                    falar(`Aqui está, <b>${nomeUsuario}</b>:<br><span class="tag">${busca}</span>${resultado}`);
+                const buscaPalavras = primeiraLinhaPartes.slice(1).map(p => p.toLowerCase());
+                let melhorChave = null;
+                let maiorScore = 0;
+
+                for (let i = 0; i < localStorage.length; i++) {
+                    const chaveOriginal = localStorage.key(i);
+                    if (chaveOriginal.startsWith("mem_")) {
+                        const chaveLimpa = chaveOriginal.replace("mem_", "").split(' ');
+                        let score = 0;
+                        buscaPalavras.forEach(p => { if (chaveLimpa.includes(p)) score++; });
+
+                        if (score > maiorScore) {
+                            maiorScore = score;
+                            melhorChave = chaveOriginal;
+                        }
+                    }
+                }
+
+                if (melhorChave) {
+                    const data = JSON.parse(localStorage.getItem(melhorChave));
+                    const tituloExibição = melhorChave.replace("mem_", "").toUpperCase();
+                    falar(`<span class="txt-destaque">${tituloExibição}</span>\n${data.valor}`, data.data);
                 } else {
-                    falar(`Não encontrei nada sobre "<b>${busca}</b>".`);
+                    falar(`Não encontrei nada parecido, <span class="txt-destaque">${nomeUsuario}</span>.`);
                 }
             }
 
-            // COMANDO: EXCLUIR
+            // EXCLUIR
             else if (comando === "excluir") {
-                const alvo = primeiraLinhaPartes[1] ? primeiraLinhaPartes[1].toLowerCase() : null;
+                const alvo = primeiraLinhaPartes.slice(1).join(' ').toLowerCase();
+                let excluiu = false;
                 if (localStorage.getItem(`mem_${alvo}`)) {
                     localStorage.removeItem(`mem_${alvo}`);
-                    falar(`<b>Memória excluída</b> com sucesso, <b>${nomeUsuario}</b>!`);
+                    excluiu = true;
                 } else {
-                    falar(`Não existe nada salvo como "<b>${alvo}</b>".`);
+                    // Busca aproximada para excluir
+                    for (let i = 0; i < localStorage.length; i++) {
+                        if (localStorage.key(i) === `mem_${alvo}`) {
+                             localStorage.removeItem(localStorage.key(i));
+                             excluiu = true;
+                             break;
+                        }
+                    }
                 }
-            }
 
-            else {
-                falar(`Comando não reconhecido. Use <b>Salvar</b>, <b>Lembrar</b>, <b>Excluir</b> ou <b>Trocar Nome</b>.`);
+                if (excluiu) falar(`<b>Memória excluída</b> com sucesso, <span class="txt-destaque">${nomeUsuario}</span>!`);
+                else falar(`Não encontrei "<b>${alvo}</b>" para apagar.`);
             }
         }, 400);
 
@@ -268,12 +339,12 @@
         chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    input.addEventListener("keypress", (e) => { 
-        if (e.key === "Enter" && !e.shiftKey) { 
-            e.preventDefault();
-            processar(); 
-        } 
-    });
+    function salvarNoStorage(chave, valor, partes, data, nome) {
+        const record = { valor: valor, data: data };
+        localStorage.setItem(`mem_${chave}`, JSON.stringify(record));
+        const tags = partes.map(t => `<span class="tag-busca">${t}</span>`).join('');
+        falar(`Beleza mensagem salva com sucesso, <span class="txt-destaque">${nome}</span>!<br>Palavras-chave: ${tags}`, data);
+    }
 </script>
 
 </body>
