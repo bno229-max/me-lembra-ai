@@ -48,9 +48,12 @@
             border-radius: 50%;
             overflow: hidden;
             border: 2px solid var(--primary);
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
             margin-bottom: 10px;
             background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .logo-circle img {
@@ -92,7 +95,7 @@
             animation: slideUp 0.3s ease-out;
         }
 
-        .bot { align-self: flex-start; background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-bottom-left-radius: 4px; }
+        .bot { align-self: flex-start; background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-bottom-left-radius: 4px; backdrop-filter: blur(10px); }
         .user { align-self: flex-end; background: linear-gradient(135deg, #222, #000); border: 1px solid rgba(255,255,255,0.15); border-bottom-right-radius: 4px; }
 
         .input-area {
@@ -104,6 +107,7 @@
             gap: 10px;
             margin-bottom: 10px;
             border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
         }
 
         textarea {
@@ -134,7 +138,7 @@
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         b { color: var(--primary); }
-        .tag { font-size: 0.7rem; color: var(--primary); display: block; border-bottom: 1px solid #333; margin-bottom: 5px; text-transform: uppercase; }
+        .tag { font-size: 0.7rem; color: var(--primary); display: block; border-bottom: 1px solid #333; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -151,7 +155,7 @@
     <div id="chat-window"></div>
 
     <div class="input-area">
-        <textarea id="userInput" placeholder="Salvar, Lembrar ou Excluir..." rows="1"></textarea>
+        <textarea id="userInput" placeholder="Salvar, Lembrar, Excluir..." rows="1"></textarea>
         <button onclick="processar()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         </button>
@@ -172,7 +176,7 @@
         if (!nome) {
             falar("Olá! Sou sua <b>memória auxiliar</b>. Como devo te chamar?");
         } else {
-            falar(`Fala, <b>${nome}</b>! O que vamos organizar hoje?`);
+            falar(`Fala, <b>${nome}</b>! No que vamos focar hoje?`);
         }
     };
 
@@ -195,18 +199,25 @@
 
         const nomeUsuario = localStorage.getItem('user_name');
         const linhas = rawText.split('\n');
+        const lowerText = rawText.toLowerCase();
         const primeiraLinhaPartes = linhas[0].split(/\s+/);
         const comando = primeiraLinhaPartes[0].toLowerCase();
 
         setTimeout(() => {
-            if (!nomeUsuario) {
-                localStorage.setItem('user_name', rawText);
-                falar(`Prazer, <b>${rawText}</b>! Pode começar a salvar.`);
+            // LÓGICA DE DEFINIR OU TROCAR NOME
+            if (!nomeUsuario || lowerText === "trocar nome") {
+                if (lowerText === "trocar nome") {
+                    localStorage.removeItem('user_name');
+                    falar("Ok, como gostaria de ser chamado(a) agora?");
+                } else {
+                    localStorage.setItem('user_name', rawText);
+                    falar(`Tudo pronto, <b>${rawText}</b>! Nome atualizado com sucesso. No que posso ajudar?`);
+                }
                 input.value = '';
                 return;
             }
 
-            // COMANDO SALVAR
+            // COMANDO: SALVAR
             if (comando === "salvar") {
                 const titulo = primeiraLinhaPartes[1] ? primeiraLinhaPartes[1].toLowerCase() : null;
                 let conteudo = primeiraLinhaPartes.slice(2).join(' ').trim();
@@ -218,41 +229,41 @@
 
                 if (titulo && conteudo) {
                     localStorage.setItem(`mem_${titulo}`, conteudo);
-                    const frases = [
-                        `Pode deixar, <b>${nomeUsuario}</b>! Já guardei o <b>${titulo}</b>.`,
-                        `Beleza! Mensagem sobre <b>${titulo}</b> salva com sucesso.`,
-                        `Tranquilo, já memorizei <b>${titulo}</b> para você.`
-                    ];
-                    falar(frases[Math.floor(Math.random() * frases.length)]);
+                    falar(`Beleza mensagem salva com sucesso, <b>${nomeUsuario}</b>! Guardado em "<b>${titulo}</b>".`);
                 } else {
-                    falar(`<b>${nomeUsuario}</b>, faltou o conteúdo. Ex: <i>Salvar cpf 123...</i>`);
+                    falar(`<b>${nomeUsuario}</b>, faltou o conteúdo! Ex: Salvar [título] [informação]`);
                 }
             } 
             
-            // COMANDO LEMBRAR
+            // COMANDO: LEMBRAR
             else if (comando === "lembrar") {
                 const busca = primeiraLinhaPartes[1] ? primeiraLinhaPartes[1].toLowerCase() : null;
                 const resultado = localStorage.getItem(`mem_${busca}`);
                 if (resultado) {
                     falar(`Aqui está, <b>${nomeUsuario}</b>:<br><span class="tag">${busca}</span>${resultado}`);
                 } else {
-                    falar(`Não encontrei nada sobre "<b>${busca}</b>".`);
+                    falar(`Não encontrei nada sobre "<b>${busca}</b>", <b>${nomeUsuario}</b>.`);
                 }
             }
 
-            // COMANDO EXCLUIR
+            // COMANDO: EXCLUIR
             else if (comando === "excluir") {
                 const alvo = primeiraLinhaPartes[1] ? primeiraLinhaPartes[1].toLowerCase() : null;
                 if (localStorage.getItem(`mem_${alvo}`)) {
                     localStorage.removeItem(`mem_${alvo}`);
                     falar(`<b>Memória excluída</b> com sucesso, <b>${nomeUsuario}</b>!`);
                 } else {
-                    falar(`Não existe "<b>${alvo}</b>" para excluir.`);
+                    falar(`Não existe nada salvo como "<b>${alvo}</b>".`);
                 }
             }
 
+            // COMANDO: TROCAR NOME (Tratado no início, mas adicionado aqui por segurança)
+            else if (rawText.toLowerCase() === "trocar nome") {
+                // Já tratado no topo do script
+            }
+
             else {
-                falar(`Comando não reconhecido. Use <b>Salvar</b>, <b>Lembrar</b> ou <b>Excluir</b>.`);
+                falar(`Comando não reconhecido. Use <b>Salvar</b>, <b>Lembrar</b>, <b>Excluir</b> ou <b>Trocar Nome</b>.`);
             }
         }, 400);
 
