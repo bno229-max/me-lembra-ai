@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Me lembra aí!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f2fe;
+            --bg: #0a0a0c;
+            --glass: rgba(255, 255, 255, 0.07);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle at top right, #1a1a2e, #0a0a0c);
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            height: 100%;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
+            margin-bottom: 10px;
+            background: #000;
+        }
+
+        .logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        header h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            margin: 0;
+            background: linear-gradient(to bottom, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p { font-size: 0.65rem; opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; margin: 5px 0; }
+
+        #chat-window {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scrollbar-width: none;
+        }
+
+        #chat-window::-webkit-scrollbar { display: none; }
+
+        .msg {
+            padding: 14px 20px;
+            border-radius: 22px;
+            max-width: 85%;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .bot { align-self: flex-start; background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-bottom-left-radius: 4px; }
+        .user { align-self: flex-end; background: linear-gradient(135deg, #222, #000); border: 1px solid rgba(255,255,255,0.15); border-bottom-right-radius: 4px; }
+
+        .input-area {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 24px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        textarea {
+            background: transparent;
+            border: none;
+            color: white;
+            flex-grow: 1;
+            font-size: 1rem;
+            outline: none;
+            font-family: 'Montserrat', sans-serif;
+            resize: none;
+            padding: 8px 0;
+            max-height: 120px;
+        }
+
+        button {
+            background: var(--primary);
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        b { color: var(--primary); }
+        .tag { font-size: 0.7rem; color: var(--primary); display: block; border-bottom: 1px solid #333; margin-bottom: 5px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <div class="logo-circle">
+            <img src="logo.png" alt="Logo">
+        </div>
+        <h1>Me lembra aí!</h1>
+        <p>Lembretes e Organização</p>
+    </header>
+
+    <div id="chat-window"></div>
+
+    <div class="input-area">
+        <textarea id="userInput" placeholder="Salvar, Lembrar ou Excluir..." rows="1"></textarea>
+        <button onclick="processar()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+    </div>
+</div>
+
+<script>
+    const chatWindow = document.getElementById('chat-window');
+    const input = document.getElementById('userInput');
+
+    input.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+
+    window.onload = () => {
+        const nome = localStorage.getItem('user_name');
+        if (!nome) {
+            falar("Olá! Sou sua <b>memória auxiliar</b>. Como devo te chamar?");
+        } else {
+            falar(`Fala, <b>${nome}</b>! O que vamos organizar hoje?`);
+        }
+    };
+
+    function falar(texto) {
+        const div = document.createElement('div');
+        div.className = 'msg bot';
+        div.innerHTML = texto;
+        chatWindow.appendChild(div);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function processar() {
+        const rawText = input.value.trim();
+        if (!rawText) return;
+
+        const msgUser = document.createElement('div');
+        msgUser.className = 'msg user';
+        msgUser.innerText = rawText;
+        chatWindow.appendChild(msgUser);
+
+        const nomeUsuario = localStorage.getItem('user_name');
+        const linhas = rawText.split('\n');
+        const primeiraLinhaPartes = linhas[0].split(/\s+/);
+        const comando = primeiraLinhaPartes[0].toLowerCase();
+
+        setTimeout(() => {
+            if (!nomeUsuario) {
+                localStorage.setItem('user_name', rawText);
+                falar(`Prazer, <b>${rawText}</b>! Pode começar a salvar.`);
+                input.value = '';
+                return;
+            }
+
+            // COMANDO SALVAR
+            if (comando === "salvar") {
+                const titulo = primeiraLinhaPartes[1] ? primeiraLinhaPartes[1].toLowerCase() : null;
+                let conteudo = primeiraLinhaPartes.slice(2).join(' ').trim();
+                
+                if (linhas.length > 1) {
+                    const restoLinhas = linhas.slice(1).join('\n').trim();
+                    conteudo = conteudo ? conteudo + '\n' + restoLinhas : restoLinhas;
+                }
+
+                if (titulo && conteudo) {
+                    localStorage.setItem(`mem_${titulo}`, conteudo);
+                    const frases = [
+                        `Pode deixar, <b>${nomeUsuario}</b>! Já guardei o <b>${titulo}</b>.`,
+                        `Beleza! Mensagem sobre <b>${titulo}</b> salva com sucesso.`,
+                        `Tranquilo, já memorizei <b>${titulo}</b> para você.`
+                    ];
+                    falar(frases[Math.floor(Math.random() * frases.length)]);
+                } else {
+                    falar(`<b>${nomeUsuario}</b>, faltou o conteúdo. Ex: <i>Salvar cpf 123...</i>`);
+                }
+            } 
+            
+            // COMANDO LEMBRAR
+            else if (comando === "lembrar") {
+                const busca = primeiraLinhaPartes[1] ? primeiraLinhaPartes[1].toLowerCase() : null;
+                const resultado = localStorage.getItem(`mem_${busca}`);
+                if (resultado) {
+                    falar(`Aqui está, <b>${nomeUsuario}</b>:<br><span class="tag">${busca}</span>${resultado}`);
+                } else {
+                    falar(`Não encontrei nada sobre "<b>${busca}</b>".`);
+                }
+            }
+
+            // COMANDO EXCLUIR
+            else if (comando === "excluir") {
+                const alvo = primeiraLinhaPartes[1] ? primeiraLinhaPartes[1].toLowerCase() : null;
+                if (localStorage.getItem(`mem_${alvo}`)) {
+                    localStorage.removeItem(`mem_${alvo}`);
+                    falar(`<b>Memória excluída</b> com sucesso, <b>${nomeUsuario}</b>!`);
+                } else {
+                    falar(`Não existe "<b>${alvo}</b>" para excluir.`);
+                }
+            }
+
+            else {
+                falar(`Comando não reconhecido. Use <b>Salvar</b>, <b>Lembrar</b> ou <b>Excluir</b>.`);
+            }
+        }, 400);
+
+        input.value = '';
+        input.style.height = 'auto';
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    input.addEventListener("keypress", (e) => { 
+        if (e.key === "Enter" && !e.shiftKey) { 
+            e.preventDefault();
+            processar(); 
+        } 
+    });
+</script>
+
+</body>
+</html>
