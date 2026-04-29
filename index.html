@@ -134,6 +134,7 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            transition: transform 0.2s;
         }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -204,14 +205,14 @@
         const comando = primeiraLinhaPartes[0].toLowerCase();
 
         setTimeout(() => {
-            // LÓGICA DE DEFINIR OU TROCAR NOME
+            // TROCAR NOME OU PRIMEIRO ACESSO
             if (!nomeUsuario || lowerText === "trocar nome") {
                 if (lowerText === "trocar nome") {
                     localStorage.removeItem('user_name');
                     falar("Ok, como gostaria de ser chamado(a) agora?");
                 } else {
                     localStorage.setItem('user_name', rawText);
-                    falar(`Tudo pronto, <b>${rawText}</b>! Nome atualizado com sucesso. No que posso ajudar?`);
+                    falar(`Tudo pronto, <b>${rawText}</b>! No que posso ajudar?`);
                 }
                 input.value = '';
                 return;
@@ -242,7 +243,7 @@
                 if (resultado) {
                     falar(`Aqui está, <b>${nomeUsuario}</b>:<br><span class="tag">${busca}</span>${resultado}`);
                 } else {
-                    falar(`Não encontrei nada sobre "<b>${busca}</b>", <b>${nomeUsuario}</b>.`);
+                    falar(`Não encontrei nada sobre "<b>${busca}</b>".`);
                 }
             }
 
@@ -255,11 +256,6 @@
                 } else {
                     falar(`Não existe nada salvo como "<b>${alvo}</b>".`);
                 }
-            }
-
-            // COMANDO: TROCAR NOME (Tratado no início, mas adicionado aqui por segurança)
-            else if (rawText.toLowerCase() === "trocar nome") {
-                // Já tratado no topo do script
             }
 
             else {
